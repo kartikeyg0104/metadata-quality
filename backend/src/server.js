@@ -44,7 +44,12 @@ const upload = multer({
 
 // CORS headers - configurable via environment variable
 app.use((req, res, next) => {
-  const allowedOrigin = process.env.CORS_ORIGIN || '*';
+  // Handle CORS_ORIGIN - use wildcard if not set or set to 'false'
+  let allowedOrigin = process.env.CORS_ORIGIN;
+  if (!allowedOrigin || allowedOrigin === 'false' || allowedOrigin === 'undefined') {
+    allowedOrigin = '*';
+  }
+  
   res.header('Access-Control-Allow-Origin', allowedOrigin);
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   res.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');

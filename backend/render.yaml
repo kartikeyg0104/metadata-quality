@@ -8,12 +8,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 3000
       - key: DATABASE_PATH
         value: ./data/evaluations.db
-      - key: CORS_ORIGIN
-        sync: false
-        # Set this in Render Dashboard to your Vercel frontend URL
-        # Example: https://your-app.vercel.app
     healthCheckPath: /health
+    # Note: Add CORS_ORIGIN manually in Render Dashboard
+    # CORS_ORIGIN=https://metadata-quality.vercel.app
