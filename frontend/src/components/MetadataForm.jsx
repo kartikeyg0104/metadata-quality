@@ -47,6 +47,8 @@ export default function MetadataForm({ onEvaluate, isLoading }) {
     methodology: '',
     funding: ''
   });
+  
+  const [saveToHistory, setSaveToHistory] = useState(true);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -70,7 +72,7 @@ export default function MetadataForm({ onEvaluate, isLoading }) {
       funding: formData.funding.trim() || undefined
     };
 
-    onEvaluate(metadata);
+    onEvaluate(metadata, saveToHistory);
   };
 
   const handleLoadSample = (type) => {
@@ -233,6 +235,20 @@ export default function MetadataForm({ onEvaluate, isLoading }) {
             onChange={handleChange}
             placeholder="Grant ABC-123"
           />
+        </div>
+
+        {/* Save to History Option */}
+        <div className="form-group" style={{ marginTop: '1rem' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={saveToHistory}
+              onChange={(e) => setSaveToHistory(e.target.checked)}
+              style={{ cursor: 'pointer' }}
+            />
+            <span>Save evaluation to history</span>
+          </label>
+          <span className="hint">Enable to track evaluations in Dashboard and History</span>
         </div>
 
         {/* Actions */}

@@ -6,12 +6,18 @@ import Database from 'better-sqlite3';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { mkdirSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Initialize database
-const dbPath = process.env.DB_PATH || path.join(__dirname, '../../data/metadata-quality.db');
+const dbPath = process.env.DATABASE_PATH || process.env.DB_PATH || path.join(__dirname, '../../data/metadata-quality.db');
+
+// Ensure the data directory exists
+const dbDir = path.dirname(dbPath);
+mkdirSync(dbDir, { recursive: true });
+
 const db = new Database(dbPath);
 
 // Enable WAL mode for better performance
