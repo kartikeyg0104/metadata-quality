@@ -14,7 +14,9 @@ Many open datasets are underused or rejected not because the data is bad, but be
 
 ## Quick Start
 
-### 1. Start the Backend
+### Local Development
+
+#### 1. Start the Backend
 
 ```bash
 cd backend
@@ -23,7 +25,7 @@ npm start
 # API Server runs at http://localhost:3000
 ```
 
-### 2. Start the Frontend
+#### 2. Start the Frontend
 
 ```bash
 cd frontend
@@ -32,12 +34,26 @@ npm run dev
 # Web UI runs at http://localhost:5173
 ```
 
-### 3. Use the Application
+#### 3. Use the Application
 
 1. Open http://localhost:5173 in your browser
 2. Enter dataset metadata in the form
 3. Click "Evaluate Metadata"
 4. View your quality score and recommendations
+
+### Production Deployment
+
+**Backend:** Deploy to [Render](https://render.com)  
+**Frontend:** Deploy to [Vercel](https://vercel.com)
+
+📖 **See [DEPLOYMENT.md](DEPLOYMENT.md) for complete deployment instructions**
+
+Quick deploy checklist:
+- ✅ Push code to GitHub
+- ✅ Deploy backend to Render (auto-detects `backend/render.yaml`)
+- ✅ Deploy frontend to Vercel (auto-detects Vite)
+- ✅ Set `VITE_API_URL` in Vercel to your Render backend URL
+- ✅ Set `CORS_ORIGIN` in Render to your Vercel frontend URL
 
 ### CLI Usage
 
