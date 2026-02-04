@@ -1,0 +1,49 @@
+{
+  "title": "Global Surface Temperature Anomalies Dataset (1880-2023)",
+  "description": "This comprehensive dataset contains monthly global surface temperature anomaly records from 1880 to 2023, compiled from over 26,000 weather stations worldwide. The dataset provides temperature deviations from the 1951-1980 baseline period, enabling researchers to track long-term climate trends and patterns. Data includes land-based measurements, ocean surface temperatures from ships and buoys, and satellite-derived observations for recent decades. Quality control procedures include automated screening algorithms and manual review for outliers.",
+  "authors": [
+    {
+      "name": "Dr. Sarah Chen",
+      "email": "s.chen@climate-research.org",
+      "orcid": "0000-0002-1234-5678",
+      "affiliation": "Global Climate Research Institute"
+    },
+    {
+      "name": "Prof. Michael Torres",
+      "email": "m.torres@university.edu",
+      "affiliation": "Department of Atmospheric Sciences"
+    }
+  ],
+  "keywords": [
+    "climate change",
+    "temperature anomaly",
+    "global warming",
+    "surface temperature",
+    "historical climate data",
+    "NOAA",
+    "meteorological data"
+  ],
+  "license": "CC-BY-4.0",
+  "publisher": "Global Climate Research Institute",
+  "publication_date": "2024-01-15",
+  "version": "4.2.1",
+  "doi": "10.5281/zenodo.1234567",
+  "methodology": "Temperature anomalies are calculated relative to the 1951-1980 climatological baseline. Station data undergoes homogenization to account for station relocations, instrument changes, and time-of-observation biases. Ocean data is derived from ICOADS ship observations and Argo float measurements. Satellite data (AVHRR) supplements surface measurements from 1979 onward. Grid cells are weighted by area to compute global averages.",
+  "funding": "National Science Foundation Grant #AGS-2012345, NASA Earth Science Division Grant #NNX12AB34G",
+  "temporal_coverage": {
+    "start_date": "1880-01-01",
+    "end_date": "2023-12-31"
+  },
+  "spatial_coverage": "Global (180°W to 180°E, 90°S to 90°N)",
+  "data_format": ["CSV", "NetCDF", "JSON"],
+  "access_url": "https://data.climate-research.org/datasets/gst-anomalies-v4.2.1",
+  "contact_email": "data-support@climate-research.org",
+  "citations": [
+    "Chen, S., & Torres, M. (2023). Global Surface Temperature Trends: A Century of Change. Nature Climate Change, 13(4), 312-320.",
+    "Torres, M., et al. (2022). Homogenization Methods for Historical Climate Records. Journal of Climate, 35(8), 2456-2470."
+  ],
+  "related_datasets": [
+    "https://doi.org/10.5281/zenodo.9876543",
+    "https://doi.org/10.7927/DATA-ABC123"
+  ]
+}

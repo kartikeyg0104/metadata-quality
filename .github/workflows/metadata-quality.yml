@@ -1,0 +1,197 @@
+# Metadata Quality Platform - GitHub Actions Workflow
+# Validates metadata quality as part of CI/CD pipeline
+
+name: Metadata Quality Check
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'data/**'
+      - 'metadata/**'
+      - '*.json'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'data/**'
+      - 'metadata/**'
+      - '*.json'
+  workflow_dispatch:
+    inputs:
+      metadata_file:
+        description: 'Path to metadata file to validate'
+        required: false
+        default: 'metadata.json'
+      min_score:
+        description: 'Minimum acceptable quality score (0-100)'
+        required: false
+        default: '60'
+
+jobs:
+  validate-metadata:
+    name: Validate Metadata Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Find metadata files
+        id: find-metadata
+        run: |
+          # Find all JSON files that might be metadata
+          FILES=$(find . -name "*.json" -not -path "./node_modules/*" -not -path "./.git/*" -not -name "package*.json" -not -name "tsconfig*.json" | head -20)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "Found files: $FILES"
+
+      - name: Validate metadata quality
+        working-directory: ./backend
+        env:
+          MIN_SCORE: ${{ github.event.inputs.min_score || '60' }}
+        run: |
+          echo "🔍 Metadata Quality Validation"
+          echo "=============================="
+          echo ""
+          
+          FAILED=0
+          PASSED=0
+          
+          # Check if there are metadata files to validate
+          if [ -f "../metadata.json" ]; then
+            echo "📄 Validating: metadata.json"
+            RESULT=$(node src/cli.js evaluate ../metadata.json 2>&1) || true
+            echo "$RESULT"
+            
+            # Extract score from result
+            SCORE=$(echo "$RESULT" | grep -oP 'Score: \K[0-9]+' || echo "0")
+            
+            if [ "$SCORE" -ge "$MIN_SCORE" ]; then
+              echo "✅ PASSED (Score: $SCORE >= $MIN_SCORE)"
+              PASSED=$((PASSED + 1))
+            else
+              echo "❌ FAILED (Score: $SCORE < $MIN_SCORE)"
+              FAILED=$((FAILED + 1))
+            fi
+            echo ""
+          fi
+          
+          # Check data directory
+          if [ -d "../data" ]; then
+            for file in ../data/*.json; do
+              if [ -f "$file" ]; then
+                echo "📄 Validating: $file"
+                RESULT=$(node src/cli.js evaluate "$file" 2>&1) || true
+                echo "$RESULT"
+                
+                SCORE=$(echo "$RESULT" | grep -oP 'Score: \K[0-9]+' || echo "0")
+                
+                if [ "$SCORE" -ge "$MIN_SCORE" ]; then
+                  echo "✅ PASSED (Score: $SCORE >= $MIN_SCORE)"
+                  PASSED=$((PASSED + 1))
+                else
+                  echo "❌ FAILED (Score: $SCORE < $MIN_SCORE)"
+                  FAILED=$((FAILED + 1))
+                fi
+                echo ""
+              fi
+            done
+          fi
+          
+          echo "=============================="
+          echo "📊 Summary: $PASSED passed, $FAILED failed"
+          
+          if [ "$FAILED" -gt 0 ]; then
+            echo "::error::Metadata quality check failed for $FAILED file(s)"
+            exit 1
+          fi
+          
+          echo "::notice::All metadata files passed quality validation!"
+
+      - name: Generate quality report
+        if: always()
+        working-directory: ./backend
+        run: |
+          echo "## 📊 Metadata Quality Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Score | Grade | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          
+          MIN_SCORE=${{ github.event.inputs.min_score || '60' }}
+          
+          if [ -f "../metadata.json" ]; then
+            RESULT=$(node src/cli.js evaluate ../metadata.json --format json 2>&1) || true
+            SCORE=$(echo "$RESULT" | grep -oP '"score":\s*\K[0-9]+' | head -1 || echo "N/A")
+            GRADE=$(echo "$RESULT" | grep -oP '"grade":\s*"\K[^"]+' | head -1 || echo "N/A")
+            
+            if [ "$SCORE" != "N/A" ] && [ "$SCORE" -ge "$MIN_SCORE" ]; then
+              STATUS="✅ Pass"
+            else
+              STATUS="❌ Fail"
+            fi
+            
+            echo "| metadata.json | $SCORE | $GRADE | $STATUS |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Minimum required score:** $MIN_SCORE" >> $GITHUB_STEP_SUMMARY
+
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Run backend tests
+        working-directory: ./backend
+        run: npm test --if-present
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run frontend build
+        working-directory: ./frontend
+        run: npm run build
+
+  docker-build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [validate-metadata, lint-and-test]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          if [ -f "Dockerfile" ]; then
+            docker build -t metadata-quality-platform:latest .
+            echo "Docker image built successfully"
+          else
+            echo "No Dockerfile found, skipping Docker build"
+          fi

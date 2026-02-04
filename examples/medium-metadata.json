@@ -1,0 +1,9 @@
+{
+  "title": "Urban Air Quality Measurements 2023",
+  "description": "Air quality measurements collected from monitoring stations in major metropolitan areas during 2023. Includes PM2.5, PM10, NO2, O3, and CO concentration levels.",
+  "authors": ["Research Team A"],
+  "keywords": ["air quality", "pollution"],
+  "license": "CC-BY-4.0",
+  "publisher": "City Environmental Agency",
+  "publication_date": "2024-02-01"
+}

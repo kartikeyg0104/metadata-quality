@@ -1,0 +1,38 @@
+{
+  "name": "metadata-quality-platform",
+  "version": "1.0.0",
+  "description": "A rule-based platform for evaluating open dataset metadata quality against publishing and FAIR-inspired standards",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "cli": "node src/cli.js",
+    "test": "node --test src/**/*.test.js"
+  },
+  "keywords": [
+    "metadata",
+    "quality",
+    "compliance",
+    "FAIR",
+    "open-data",
+    "validation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.22.0",
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
+    "better-sqlite3": "^12.6.2",
+    "compromise": "^14.14.5",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "natural": "^8.1.0",
+    "pdfkit": "^0.17.2",
+    "uuid": "^13.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
